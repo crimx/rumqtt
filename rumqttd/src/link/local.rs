@@ -149,7 +149,7 @@ impl LinkTx {
     }
 
     /// Send raw device data
-    fn push(&mut self, data: Packet) -> Result<usize, LinkError> {
+    fn push(&self, data: Packet) -> Result<usize, LinkError> {
         let len = {
             let mut buffer = self.recv_buffer.lock();
             buffer.push_back(data);
@@ -163,7 +163,7 @@ impl LinkTx {
     }
 
     /// Send raw device data
-    pub async fn send(&mut self, data: Packet) -> Result<usize, LinkError> {
+    pub async fn send(&self, data: Packet) -> Result<usize, LinkError> {
         let len = {
             let mut buffer = self.recv_buffer.lock();
             buffer.push_back(data);
@@ -176,7 +176,7 @@ impl LinkTx {
         Ok(len)
     }
 
-    fn try_push(&mut self, data: Packet) -> Result<usize, LinkError> {
+    fn try_push(&self, data: Packet) -> Result<usize, LinkError> {
         let len = {
             let mut buffer = self.recv_buffer.lock();
             buffer.push_back(data);
@@ -188,7 +188,7 @@ impl LinkTx {
         Ok(len)
     }
 
-    pub(crate) async fn notify(&mut self) -> Result<(), LinkError> {
+    pub(crate) async fn notify(&self) -> Result<(), LinkError> {
         self.router_tx
             .send_async((self.connection_id, Event::DeviceData))
             .await?;
@@ -197,7 +197,7 @@ impl LinkTx {
     }
 
     /// Sends a MQTT Publish to the router
-    pub fn publish<S, V>(&mut self, topic: S, payload: V) -> Result<usize, LinkError>
+    pub fn publish<S, V>(&self, topic: S, payload: V) -> Result<usize, LinkError>
     where
         S: Into<Bytes>,
         V: Into<Bytes>,
@@ -216,7 +216,7 @@ impl LinkTx {
     }
 
     /// Sends a MQTT Publish to the router
-    pub fn try_publish<S, V>(&mut self, topic: S, payload: V) -> Result<usize, LinkError>
+    pub fn try_publish<S, V>(&self, topic: S, payload: V) -> Result<usize, LinkError>
     where
         S: Into<Bytes>,
         V: Into<Bytes>,
@@ -236,7 +236,7 @@ impl LinkTx {
     }
 
     /// Sends a MQTT Subscribe to the eventloop
-    pub fn subscribe<S: Into<String>>(&mut self, filter: S) -> Result<usize, LinkError> {
+    pub fn subscribe<S: Into<String>>(&self, filter: S) -> Result<usize, LinkError> {
         let filters = vec![Filter {
             path: filter.into(),
             qos: QoS::AtMostOnce,
@@ -252,7 +252,7 @@ impl LinkTx {
     }
 
     /// Sends a MQTT Subscribe to the eventloop
-    pub fn try_subscribe<S: Into<String>>(&mut self, filter: S) -> Result<usize, LinkError> {
+    pub fn try_subscribe<S: Into<String>>(&self, filter: S) -> Result<usize, LinkError> {
         let filters = vec![Filter {
             path: filter.into(),
             qos: QoS::AtMostOnce,
@@ -268,7 +268,7 @@ impl LinkTx {
     }
 
     /// Request to get device shadow
-    pub fn shadow<S: Into<String>>(&mut self, filter: S) -> Result<(), LinkError> {
+    pub fn shadow<S: Into<String>>(&self, filter: S) -> Result<(), LinkError> {
         let message = Event::Shadow(ShadowRequest {
             filter: filter.into(),
         });
